@@ -1,3 +1,30 @@
 body {
     text-align: center;
 }
+.top-bar {
+    height: 60px;
+    line-height: 60px;
+    background-color: #206030;
+    overflow: hidden;
+}
+.info-panel {
+    width: 505px;
+    margin: 0 auto;
+    font-size: 18px;
+    font-family: sans-serif;
+    color: white;
+    position: relative;
+}
+#score {
+    float: left;
+    padding-left: 10px
+}
+#msg {
+    position: absolute;
+    left: 130px;
+    width: 240px;
+}
+#chances {
+    float: right;
+    padding-right: 10px;
+}

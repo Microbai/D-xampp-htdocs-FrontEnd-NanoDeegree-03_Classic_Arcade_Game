@@ -1,8 +1,10 @@
-// 这是我们的玩家要躲避的敌人 
-var Enemy = function() {
+// 这是我们的玩家要躲避的敌人
+var Enemy = function(x, y) {
     // 要应用到每个敌人的实例的变量写在这里
     // 我们已经提供了一个来帮助你实现更多
-
+    this.x = x;
+    this.y = y;
+    this.speed =  Math.random()*250+150;
     // 敌人的图片或者雪碧图，用一个我们提供的工具函数来轻松的加载文件
     this.sprite = 'images/enemy-bug.png';
 };
@@ -12,6 +14,10 @@ var Enemy = function() {
 Enemy.prototype.update = function(dt) {
     // 你应该给每一次的移动都乘以 dt 参数，以此来保证游戏在所有的电脑上
     // 都是以同样的速度运行的
+    this.x += dt * this.speed
+     if(this.x >= 505){
+        this.x = -30;
+    }
 };
 
 // 此为游戏必须的函数，用来在屏幕上画出敌人，
@@ -21,13 +27,99 @@ Enemy.prototype.render = function() {
 
 // 现在实现你自己的玩家类
 // 这个类需要一个 update() 函数， render() 函数和一个 handleInput()函数
+var Player = function(x, y) {
+    // 要应用到每个玩家的实例的变量写在这里
+    // 我们已经提供了一个来帮助你实现更多
+    this.x = x;
+    this.y = y;
+    this.chances = 3;
+    this.score = 0;
+    // 玩家的图片或者雪碧图，用一个我们提供的工具函数来轻松的加载文件
+    this.sprite = 'images/char-horn-girl.png';
+};
+Player.prototype.checkCollision = function () {
+  for (var i = 0; i < allEnemies.length; i++) {
+      // 判断 y 轴方向是否发生碰撞
+      if (Math.abs(this.y - allEnemies[i].y) < 60) {
+          // 判断  x 轴方向是否发生碰撞
+          if ((Math.abs(this.x - allEnemies[i].x)) < 60) {
+              this.x = 200;
+              this.y = 404;
+              this.chances --;
+              chancesTxt.update();
+              if(player.chances == 0){
+                  swal("游戏失败请重新开始")
+                    .then(() => {
+                       location.replace(location.href);
+                    });
+              }
+                }
+              }
+            }
+          };
+
+
+// 此为游戏必须的函数，用来更新玩家的位置
+// 参数: dt ，表示时间间隙
+Player.prototype.update = function(dt) {
+    // 你应该给每一次的移动都乘以 dt 参数，以此来保证游戏在所有的电脑上
+    // 都是以同样的速度运行的
+    if(this.y <= -11){
+      player.score++;
+      scoreTxt.update();
+      this.x = 200;
+      this.y = 404;
+ }
+ this.checkCollision();
+};
+
+// 此为游戏必须的函数，用来在屏幕上画出玩家，
+Player.prototype.render = function() {
+    ctx.drawImage(Resources.get(this.sprite), this.x, this.y);
+};
+// 此为游戏必须的函数，根据键盘指令执行动作
+Player.prototype.handleInput = function (movement) {
+  console.log(this.x, this.y);
+   switch (movement) {
+      case 'left':
+         if (this.x > 0) {
+            this.x -= 101;
+         } break;
+      case 'right':
+         if (this.x < 404) {
+            this.x += 101;
+         } break;
+      case 'up':
+         if (this.y > 55) {
+            this.y -= 83;
+         } break;
+      case 'down':
+        if (this.y < 387) {
+            this.y += 83;
+         } break;
+   }
+}
+
+//下面是用来计分统计的变量
+var scoreTxt = document.getElementById('score'),
+    chancesTxt = document.getElementById('chances');
+
+scoreTxt.update = function() {
+    this.innerText = "Score: " + player.score;
+}
+chancesTxt.update = function() {
+    this.innerText = "";
+    for(var i = 0; i < player.chances; i ++) {
+        this.innerText += "♥";
+    }
+}
 
 
 // 现在实例化你的所有对象
 // 把所有敌人的对象都放进一个叫 allEnemies 的数组里面
 // 把玩家对象放进一个叫 player 的变量里面
-
-
+let allEnemies = [new Enemy(0, 83 * 2 + 55, 200),new Enemy(0, 83 * 0 + 55, 200),new Enemy(0, 83 * 1 + 55, 200)];
+let player = new Player(101, 83 * 3 + 55);
 // 这段代码监听游戏玩家的键盘点击事件并且代表将按键的关键数字送到 Play.handleInput()
 // 方法里面。你不需要再更改这段代码了。
 document.addEventListener('keyup', function(e) {
